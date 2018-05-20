@@ -90,6 +90,25 @@ class HandBookSpider(Spider):
     searchList = ["EG8014BDX59SDU1"]
     
     
+    body = {
+                "query": {
+                    "bool": {
+                        "must": [{
+                            "term": {
+                                "brand": ["海尔（Haier）", "海尔", "海尔 Haier"]
+                            }
+                        }],
+                        "must_not": [{
+                            "term": {
+                                "model": "unknown"
+                            }
+                        }]
+                    }
+                }
+            }
+
+    
+    
     def __init__(self):
         
         self.driver = webdriver.PhantomJS(executable_path=r"E:\phantomjs-2.1.1-windows\bin\phantomjs.exe")
@@ -116,6 +135,9 @@ class HandBookSpider(Spider):
 #             }
         
         for item in self.searchList:
+            
+            
+            
             requestUrl = self.tampleUrl+item
             
             #print requestUrl
@@ -127,7 +149,12 @@ class HandBookSpider(Spider):
             meta = {}
             #meta["str"] = responseStr
             meta["keyWord"] = item
-            yield Request(url=requestUrl, callback=self.parse_search_ret, meta=meta)
+            
+            ret = es.search(index="jd-classify",doc_type="event",body=body)
+            
+            
+            print ret
+            #yield Request(url=requestUrl, callback=self.parse_search_ret, meta=meta)
             
             
             
